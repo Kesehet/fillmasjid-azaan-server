@@ -46,6 +46,7 @@ app.post("/consumer", async ({ body }, res) => {
 	var streamNow = senderStream[body.connectionID];
 	if(streamNow == undefined){
 		res.json({})
+        return
 	}
 
         // Reset the timeout for this stream since it's being accessed
