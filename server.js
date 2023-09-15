@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 let senderStream = {};
 const PEERS = {};
 const cherry = [{
-    urls: "turn:72.235.112.32:8443",
+    urls: "72.235.112.32:8443",
     // username: "any",
     // credential: "any",
 }];
