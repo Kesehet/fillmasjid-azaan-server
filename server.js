@@ -234,7 +234,7 @@ function getFireIds(masjidToken) {
 
 // Start the server
 const server = https.createServer(options, app);
-server.listen(80, '0.0.0.0', () => console.log('server started'));
+server.listen(443, '0.0.0.0', () => console.log('server started'));
 
 // Set interval to clear peers
 setInterval(clearPeers, 5000);
