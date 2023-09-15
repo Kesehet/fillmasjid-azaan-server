@@ -6,9 +6,7 @@ const fs = require('fs');
 const https = require('https');
 
 const cors = require('cors');
-app.use(cors({
-    origin: 'https://app.fillmasjid.in'
-}));
+
 
 
 
