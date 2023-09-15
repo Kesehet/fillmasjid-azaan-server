@@ -41,6 +41,11 @@ let failedNotif = 0;
 io.metric({ name: 'Notification Sent to', value: () => notifUsers });
 io.metric({ name: 'No. of Failed Notifications', value: () => failedNotif });
 
+app.get("/", (req, res) => {
+    return "Fill Masjid Server :) ";
+})
+
+
 // Consumer endpoint
 app.post("/consumer", async ({ body }, res) => {
     const peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
