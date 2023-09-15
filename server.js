@@ -45,7 +45,7 @@ function getCherry(){
 
 
 const cherry = [{
-    urls: "turn:72.235.112.32:8443",
+    urls: "turn:72.235.112.32:8443?transport=udp",
 }];
 
 // SSL configurations
