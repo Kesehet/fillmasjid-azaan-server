@@ -20,8 +20,8 @@ var cherry =[
     
   ];
 
-var key = fs.readFileSync(__dirname + '/3duverse.com.pk');
-var cert = fs.readFileSync(__dirname + '/3duverse.com.pem');
+var key = fs.readFileSync(__dirname + '/fillmasjid.com.pk');
+var cert = fs.readFileSync(__dirname + '/fillmasjid.com.pem');
 var options = {
   key: key,
   cert: cert
