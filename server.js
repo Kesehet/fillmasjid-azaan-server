@@ -38,7 +38,7 @@ function getCherry(){
     console.log(`Username: ${temp_username}`);
     console.log(`Password: ${temp_password}`);
     cherry["username"] = temp_username;
-    cherry["password"] = temp_password;
+    cherry["credential"] = temp_password;
     return cherry;
 } 
 
