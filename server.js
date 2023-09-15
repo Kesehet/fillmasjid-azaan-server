@@ -49,6 +49,7 @@ app.post("/consumer", async ({ body }, res) => {
 	
     streamNow.getTracks().forEach(track => peer.addTrack(track, streamNow));
     const answer = await peer.createAnswer();
+    console.log(answer);
     await peer.setLocalDescription(answer);
     const payload = {sdp: peer.localDescription};
     res.json(payload);
