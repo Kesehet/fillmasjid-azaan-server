@@ -10,7 +10,7 @@ const { mem } = require('node-os-utils');
 const io = require('@pm2/io');
 const morgan = require('morgan');
 app.use(cors({
-    origin: 'https://fillmasjid.in'
+    origin: 'https://app.fillmasjid.in'
 }));
 app.use(morgan('combined'));
 
