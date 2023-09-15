@@ -37,8 +37,8 @@ function getCherry(){
     const temp_password = crypto.createHmac('sha1', shared_secret).update(temp_username).digest('hex');
     console.log(`Username: ${temp_username}`);
     console.log(`Password: ${temp_password}`);
-    cherry["username"] = temp_username;
-    cherry["credential"] = temp_password;
+    cherry[0]["username"] = temp_username;
+    cherry[0]["credential"] = temp_password;
     return cherry;
 } 
 
