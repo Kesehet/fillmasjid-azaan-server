@@ -15,7 +15,7 @@ app.use(cors({
 let senderStream = {};
 var cherry =[
     {
-        urls: "turn:72.235.112.32:8443",
+        urls: "turn:72.235.112.32:3478",
         username: "any",
         credential: "any",
       },
