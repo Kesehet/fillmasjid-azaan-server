@@ -43,7 +43,7 @@ var options = {
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({origin: 'https://fillmasjid.in'}));
+app.use(cors({origin: 'https://app.fillmasjid.in'}));
 
 app.post("/consumer", async ({ body }, res) => {
 	
