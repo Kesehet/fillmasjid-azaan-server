@@ -9,9 +9,7 @@ const cors = require('cors');
 const { mem } = require('node-os-utils');
 const io = require('@pm2/io');
 const morgan = require('morgan');
-app.use(cors({
-    origin: 'https://app.fillmasjid.com'
-}));
+
 app.use(morgan('combined'));
 
 var notifUsers = 0;
@@ -43,7 +41,7 @@ var options = {
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({origin: 'https://app.fillmasjid.com'}));
+app.use(cors({origin: 'https://app.fillmasjid.in'}));
 
 app.post("/consumer", async ({ body }, res) => {
 	
