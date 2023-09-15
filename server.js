@@ -23,8 +23,8 @@ let senderStream = {};
 const PEERS = {};
 const cherry = [{
     urls: "turn:72.235.112.32:8443",
-    username: "any",
-    credential: "any",
+    // username: "any",
+    // credential: "any",
 }];
 
 // SSL configurations
