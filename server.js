@@ -7,6 +7,7 @@ const fs = require('fs');
 const cors = require('cors');
 const io = require('@pm2/io');
 const morgan = require('morgan');
+const crypto = require('crypto');
 
 // Initialize express app
 const app = express();
@@ -21,10 +22,30 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Global variables
 let senderStream = {};
 const PEERS = {};
+
+
+
+
+
+function getCherry(){
+        
+    const shared_secret = "f3c92ab37049b5930825a38f288bb145798e72658d8ca9522044437b6be35acb";
+    const ttl = 4 * 60 * 60;
+    const expiration = Math.floor(Date.now() / 1000) + ttl;
+    const username = "user";
+    const temp_username = `${expiration}:${username}`;
+    const temp_password = crypto.createHmac('sha1', shared_secret).update(temp_username).digest('hex');
+    console.log(`Username: ${temp_username}`);
+    console.log(`Password: ${temp_password}`);
+    cherry["username"] = temp_username;
+    cherry["password"] = temp_password;
+    return cherry;
+} 
+
+
+
 const cherry = [{
-    urls: "72.235.112.32:8443",
-    // username: "any",
-    // credential: "any",
+    urls: "turn:72.235.112.32:8443",
 }];
 
 // SSL configurations
@@ -48,7 +69,7 @@ app.get("/", (req, res) => {
 
 // Consumer endpoint
 app.post("/consumer", async ({ body }, res) => {
-    const peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
+    const peer = new webrtc.RTCPeerConnection({ iceServers: getCherry() });
     await peer.setRemoteDescription(new webrtc.RTCSessionDescription(body.sdp));
 
     const currentStream = senderStream[body.connectionID.trim()];
@@ -77,7 +98,7 @@ app.post("/consumer", async ({ body }, res) => {
 
 // Broadcast endpoint
 app.post('/broadcast', async ({ body }, res) => {
-    const peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
+    const peer = new webrtc.RTCPeerConnection({ iceServers: getCherry() });
     peer.ontrack = (e) => handleTrackEvent(e, peer, body.connectionID.trim());
 
     await peer.setRemoteDescription(new webrtc.RTCSessionDescription(body.sdp));
