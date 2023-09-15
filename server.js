@@ -54,10 +54,11 @@ app.post("/consumer", async ({ body }, res) => {
 });
 
 app.post('/broadcast', async ({ body }, res) => {
+
     const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
 	
     peer.ontrack = (e) => handleTrackEvent(e, peer,body.connectionID);
-	
+	console.log(body.sdp);
     const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
     const answer = await peer.createAnswer();
