@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 let senderStream = {};
 const PEERS = {};
 const cherry = [{
-    urls: "turn:turn.fillmasjid.com:8443",
+    urls: "turn:72.235.112.32:8443",
     username: "any",
     credential: "any",
 }];
@@ -134,6 +134,7 @@ function firebaseRunLoop() {
 
 async function launchFire(hash) {
     const registeredIDs = JSON.parse(await getFireIds(hash));
+    console.log(registeredIDs);
     try {
         notifUsers = registeredIDs.length;
         failedNotif = 0;
