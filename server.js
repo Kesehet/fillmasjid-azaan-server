@@ -42,7 +42,7 @@ io.metric({ name: 'Notification Sent to', value: () => notifUsers });
 io.metric({ name: 'No. of Failed Notifications', value: () => failedNotif });
 
 app.get("/", (req, res) => {
-    return "Fill Masjid Server :) ";
+    res.send("Fill Masjid Server :)");
 })
 
 
