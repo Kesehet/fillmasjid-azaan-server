@@ -63,13 +63,13 @@ class StreamObject {
         this.connectionID = connectionID;
         this.answer = null;
         this.track = null;
-
+        this.type=type;
         // Add event listeners
         this.addEventListeners();
 
         // Set the remote description and wait for the correct state to load
         this.peer.setRemoteDescription(this.desc);
-        this.type=="admin"?this.peer.ontrack = (e) => this.handleBroadcastStreamGetter(e, peer,body.connectionID):null;
+        this.peer.ontrack = (e) => this.handleBroadcastStreamGetter(e, peer,body.connectionID);
 
     }
 
@@ -172,7 +172,7 @@ app.post('/broadcast', async ({ body }, res) => {
     const stream = new StreamObject(body.connectionID,body.sdp,type="admin");
     await stream.load();
     broadcast.addAdminStream(stream);
-    Broadcasts[body.connectionID] = broadcast;
+    Broadcasts[stream.connectionID] = broadcast;
     res.json(stream.response());
 
 	return;
