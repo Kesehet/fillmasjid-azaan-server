@@ -8,9 +8,7 @@ const https = require('https');
 const cors = require('cors');
 
 
-const recorder = require('node-record-lpcm16');
-const { Writable } = require('stream');
-const { Writer } = require('wav');
+
 
 
 
@@ -58,37 +56,6 @@ class Broadcast{
         this.consumerStreams.push(stream);
     }
 
-    startRecording() {
-        const fileStream = fs.createWriteStream(`./recordings/${this.connectionID}.wav`);
-        const audioOutputStream = new Writable({
-            write(chunk, encoding, callback) {
-                fileStream.write(chunk);
-                callback();
-            }
-        });
-
-        const wavFile = new Writer({
-            sampleRate: 44100,
-            channels: 2
-        });
-
-        wavFile.pipe(fileStream);
-
-        this.recording = recorder.record({
-            sampleRate: 44100,
-            channels: 2,
-            closeOnError: true
-        });
-
-        this.recording.stream().pipe(wavFile);
-    }
-
-    stopRecording() {
-        if (this.recording) {
-            this.recording.stop();
-        }
-    }
-    
 }
 
 
