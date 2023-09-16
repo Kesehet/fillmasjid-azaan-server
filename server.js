@@ -68,7 +68,7 @@ class StreamObject {
 
         // Set the remote description and wait for the correct state to load
         this.peer.setRemoteDescription(this.desc);
-        this.type=="admin"?this.peer.ontrack = (e) => handleTrackEvent(e, peer,body.connectionID):null;
+        this.type=="admin"?this.peer.ontrack = (e) => this.handleBroadcastStreamGetter(e, peer,body.connectionID):null;
 
     }
 
