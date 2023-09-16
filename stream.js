@@ -8,6 +8,11 @@ const https = require('https');
 const cors = require('cors');
 
 
+const recorder = require('node-record-lpcm16');
+const { Writable } = require('stream');
+const { Writer } = require('wav');
+
+
 
 
 let senderStream = {};
@@ -51,6 +56,37 @@ class Broadcast{
         console.log(this.adminStream);
         stream.AttachTrackToListen(this.adminStream.track);
         this.consumerStreams.push(stream);
+    }
+
+    startRecording() {
+        const fileStream = fs.createWriteStream(`./recordings/${this.connectionID}.wav`);
+        const audioOutputStream = new Writable({
+            write(chunk, encoding, callback) {
+                fileStream.write(chunk);
+                callback();
+            }
+        });
+
+        const wavFile = new Writer({
+            sampleRate: 44100,
+            channels: 2
+        });
+
+        wavFile.pipe(fileStream);
+
+        this.recording = recorder.record({
+            sampleRate: 44100,
+            channels: 2,
+            closeOnError: true
+        });
+
+        this.recording.stream().pipe(wavFile);
+    }
+
+    stopRecording() {
+        if (this.recording) {
+            this.recording.stop();
+        }
     }
     
 }
@@ -138,7 +174,6 @@ class StreamObject {
 
 
 app.post("/consumer", async ({ body }, res) => {
-	console.log(Broadcasts);
     if(!Broadcasts[body.connectionID]){
         res.json({})
         return
@@ -149,24 +184,6 @@ app.post("/consumer", async ({ body }, res) => {
     res.json(stream.response());
     
 	return;
-    const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
-    const desc = new webrtc.RTCSessionDescription(body.sdp);
-    await peer.setRemoteDescription(desc);
-	
-	var streamNow = senderStream[body.connectionID];
-	if(streamNow == undefined){
-		res.json({})
-        return
-	}
-
-
-	
-    streamNow.getTracks().forEach(track => peer.addTrack(track, streamNow));
-
-    const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer);
-    const payload = {sdp: peer.localDescription};
-    res.json(payload);
 });
 
 app.post('/broadcast', async ({ body }, res) => {
@@ -181,24 +198,9 @@ app.post('/broadcast', async ({ body }, res) => {
 
 	return;
 
-    const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
-	
-    peer.ontrack = (e) => handleTrackEvent(e, peer,body.connectionID);
-	
-    const desc = new webrtc.RTCSessionDescription(body.sdp);
-    await peer.setRemoteDescription(desc);
-    const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer);
-    const payload = {
-        sdp: peer.localDescription,
-		connectionID: body.connectionID
-    }
-    res.json(payload);
 });
 
-function handleTrackEvent(e, peer, connID) {
-    senderStream[connID] = e.streams[0];
-}
+
 
 var server = https.createServer(options, app);
 server.listen(443,'0.0.0.0', () => console.log('server started'));
