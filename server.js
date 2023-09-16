@@ -30,45 +30,61 @@ class StreamObject {
         this.load();
     }
 
-    addEventListeners() {
-        this.peer.onicecandidate = (event) => {
-            if (event.candidate) {
-                console.log('New ICE candidate:', event.candidate);
-                // You can send this candidate to the other peer if needed
+    class StreamObject {
+        constructor(connectionID, sdp) {
+            this.peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
+            this.desc = new webrtc.RTCSessionDescription(sdp);
+            this.connectionID = connectionID;
+            this.answer = null;
+    
+            // Add event listeners
+            this.addEventListeners();
+    
+            // Set the remote description and wait for the correct state to load
+            this.peer.setRemoteDescription(this.desc);
+        }
+    
+        addEventListeners() {
+            this.peer.onicecandidate = (event) => {
+                if (event.candidate) {
+                    console.log('New ICE candidate:', event.candidate);
+                    // You can send this candidate to the other peer if needed
+                }
+            };
+    
+            this.peer.onsignalingstatechange = () => {
+                console.log('Signaling state changed to:', this.peer.signalingState);
+                if (this.peer.signalingState === 'have-remote-offer') {
+                    this.load();
+                }
+            };
+    
+            this.peer.oniceconnectionstatechange = () => {
+                console.log('ICE connection state changed to:', this.peer.iceConnectionState);
+            };
+    
+            this.peer.onerror = (error) => {
+                console.error('RTCPeerConnection error:', error);
+            };
+        }
+    
+        async load() {
+            try {
+                this.answer = await this.peer.createAnswer();
+                await this.peer.setLocalDescription(this.answer);
+            } catch (error) {
+                console.error("Error in load method:", error);
             }
-        };
-
-        this.peer.onsignalingstatechange = () => {
-            console.log('Signaling state changed to:', this.peer.signalingState);
-        };
-
-        this.peer.oniceconnectionstatechange = () => {
-            console.log('ICE connection state changed to:', this.peer.iceConnectionState);
-        };
-
-        this.peer.onerror = (error) => {
-            console.error('RTCPeerConnection error:', error);
-        };
-    }
-
-    async load() {
-        await this.peer.setRemoteDescription(this.desc);
-        
-        if (this.peer.signalingState === 'have-remote-offer') {
-            this.answer = await this.peer.createAnswer();
-            await this.peer.setLocalDescription(this.answer);
-        } else {
-            console.error("RTCPeerConnection is not in the correct state to create an answer.");
+        }
+    
+        response() {
+            return {
+                sdp: this.peer.localDescription,
+                connectionID: this.connectionID
+            };
         }
     }
-
-    response() {
-        return {
-            sdp: this.peer.localDescription,
-            connectionID: this.connectionID
-        };
-    }
-}
+    
 
 
 
