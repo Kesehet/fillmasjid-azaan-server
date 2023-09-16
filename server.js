@@ -17,35 +17,40 @@ class Broadcast{
 }
 
 
-class StreamObject{
-    constructor(connectionID,sdp){
-       this.peer =  new webrtc.RTCPeerConnection({iceServers: cherry});
-       this.desc = new webrtc.RTCSessionDescription(sdp);
-       this.connectionID = connectionID;
-       this.answer = null;
-       this.load()
+class StreamObject {
+    constructor(connectionID, sdp) {
+        this.peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
+        this.desc = new webrtc.RTCSessionDescription(sdp);
+        this.connectionID = connectionID;
+        this.answer = null;
+        this.load();
     }
 
-    async load(){
+    async load() {
         await this.peer.setRemoteDescription(this.desc);
-        this.answer = await this.peer.createAnswer();
-        await this.peer.setLocalDescription(this.answer);
-    }
-    response(){
-        return {
-            sdp: this.peer.localDescription,
-            connectionID: this.connectionID
+        
+        // Ensure the signaling state is 'have-remote-offer' before creating an answer
+        if (this.peer.signalingState === 'have-remote-offer') {
+            this.answer = await this.peer.createAnswer();
+            await this.peer.setLocalDescription(this.answer);
+        } else {
+            console.error("RTCPeerConnection is not in the correct state to create an answer.");
         }
     }
 
+    response() {
+        return {
+            sdp: this.peer.localDescription,
+            connectionID: this.connectionID
+        };
+    }
 }
 
 
 
 
+
 let senderStream = {};
-const STREAM_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-let streamTimeouts = {};
 
 var cherry =[
     {
