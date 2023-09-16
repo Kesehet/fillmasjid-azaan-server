@@ -23,13 +23,37 @@ class StreamObject {
         this.desc = new webrtc.RTCSessionDescription(sdp);
         this.connectionID = connectionID;
         this.answer = null;
+
+        // Add event listeners
+        this.addEventListeners();
+
         this.load();
+    }
+
+    addEventListeners() {
+        this.peer.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log('New ICE candidate:', event.candidate);
+                // You can send this candidate to the other peer if needed
+            }
+        };
+
+        this.peer.onsignalingstatechange = () => {
+            console.log('Signaling state changed to:', this.peer.signalingState);
+        };
+
+        this.peer.oniceconnectionstatechange = () => {
+            console.log('ICE connection state changed to:', this.peer.iceConnectionState);
+        };
+
+        this.peer.onerror = (error) => {
+            console.error('RTCPeerConnection error:', error);
+        };
     }
 
     async load() {
         await this.peer.setRemoteDescription(this.desc);
         
-        // Ensure the signaling state is 'have-remote-offer' before creating an answer
         if (this.peer.signalingState === 'have-remote-offer') {
             this.answer = await this.peer.createAnswer();
             await this.peer.setLocalDescription(this.answer);
@@ -45,6 +69,7 @@ class StreamObject {
         };
     }
 }
+
 
 
 
