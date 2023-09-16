@@ -167,6 +167,7 @@ app.post('/broadcast', async ({ body }, res) => {
     const broadcast = new Broadcast(body.adminStream,body.connectionID);
 
     const stream = new StreamObject(body.connectionID,body.sdp,type="admin");
+    await stream.load();
     broadcast.addAdminStream(stream);
     res.json(stream.response());
 
