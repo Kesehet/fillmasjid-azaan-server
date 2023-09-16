@@ -74,13 +74,15 @@ class StreamObject {
 
     addEventListeners() {
         this.peer.onsignalingstatechange = () => {
+            console.log('peer.onsignalingstatechange ' + this.peer.signalingState);
             if (this.peer.signalingState === 'have-remote-offer') {
                 this.load();
             }
         };
 
         this.peer.oniceconnectionstatechange = () => {
-            if (this.peer != null && this.peer.iceConnectionState === 'disconnected') {
+            console.log('peer.oniceconnectionstatechange ' + this.peer.iceConnectionState);
+            if (this.peer.iceConnectionState === 'disconnected') {
                 this.cleanup();
             }
         };
