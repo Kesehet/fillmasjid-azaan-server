@@ -9,6 +9,38 @@ const cors = require('cors');
 
 
 
+class Broadcast{
+    constructor(adminStream,connectionID){
+        adminStream = adminStream;
+        this.connectionID = connectionID;
+    }
+}
+
+
+class StreamObject{
+    constructor(connectionID,sdp){
+       this.peer =  new webrtc.RTCPeerConnection({iceServers: cherry});
+       this.desc = new webrtc.RTCSessionDescription(sdp);
+       this.connectionID = connectionID;
+       this.load()
+    }
+
+    async load(){
+        this.peer.setRemoteDescription(this.desc);
+        this.answer = await peer.createAnswer();
+        await this.peer.setLocalDescription(answer);
+    }
+    response(){
+        return {
+            sdp: this.peer.localDescription,
+            connectionID: this.connectionID
+        }
+    }
+
+}
+
+
+
 
 let senderStream = {};
 const STREAM_TIMEOUT = 5 * 60 * 1000; // 5 minutes
@@ -30,6 +62,7 @@ var options = {
   cert: cert
 };
 
+
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -37,8 +70,10 @@ app.use(cors({origin: 'https://app.fillmasjid.in'}));
 
 app.post("/consumer", async ({ body }, res) => {
 	
-	
-	
+	const stream = new StreamObject(body.connectionID,body.sdp);
+    stream.load();
+    res.json(stream.response());
+	return;
     const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
     const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
@@ -49,30 +84,26 @@ app.post("/consumer", async ({ body }, res) => {
         return
 	}
 
-        // Reset the timeout for this stream since it's being accessed
-        if (streamTimeouts[body.connectionID]) {
-            clearTimeout(streamTimeouts[body.connectionID]);
-            streamTimeouts[body.connectionID] = setTimeout(() => {
-                delete senderStream[body.connectionID];
-                delete streamTimeouts[body.connectionID];
-                console.log(`Stream with connectionID ${body.connectionID} has been removed due to inactivity.`);
-            }, STREAM_TIMEOUT);
-        }
+
 	
     streamNow.getTracks().forEach(track => peer.addTrack(track, streamNow));
+
     const answer = await peer.createAnswer();
-    console.log(answer);
     await peer.setLocalDescription(answer);
     const payload = {sdp: peer.localDescription};
     res.json(payload);
 });
 
 app.post('/broadcast', async ({ body }, res) => {
+    const stream = new StreamObject(body.connectionID,body.sdp);
+    stream.load();
+    res.json(stream.response());
+	return;
 
     const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
 	
     peer.ontrack = (e) => handleTrackEvent(e, peer,body.connectionID);
-	console.log(body.sdp);
+	
     const desc = new webrtc.RTCSessionDescription(body.sdp);
     await peer.setRemoteDescription(desc);
     const answer = await peer.createAnswer();
@@ -86,18 +117,6 @@ app.post('/broadcast', async ({ body }, res) => {
 
 function handleTrackEvent(e, peer, connID) {
     senderStream[connID] = e.streams[0];
-
-    // Clear any existing timeout for this stream
-    if (streamTimeouts[connID]) {
-        clearTimeout(streamTimeouts[connID]);
-    }
-
-    // Set a new timeout to remove the stream after the specified period
-    streamTimeouts[connID] = setTimeout(() => {
-        delete senderStream[connID];
-        delete streamTimeouts[connID];
-        console.log(`Stream with connectionID ${connID} has been removed due to inactivity.`);
-    }, STREAM_TIMEOUT);
 }
 
 var server = https.createServer(options, app);
