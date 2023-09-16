@@ -35,7 +35,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({origin: 'https://app.fillmasjid.in'}));
 
 
-var Broadcasts = [];
+var Broadcasts = {};
 
 
 class Broadcast{
@@ -140,7 +140,9 @@ app.post("/consumer", async ({ body }, res) => {
 	
 	const stream = new StreamObject(body.connectionID,body.sdp);
     Broadcasts[body.connectionID].addConsumerStream(stream);
+    await stream.load();
     res.json(stream.response());
+    
 	return;
     const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
     const desc = new webrtc.RTCSessionDescription(body.sdp);
