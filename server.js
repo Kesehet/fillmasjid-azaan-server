@@ -77,7 +77,7 @@ app.use(cors({origin: 'https://app.fillmasjid.in'}));
 app.post("/consumer", async ({ body }, res) => {
 	
 	const stream = new StreamObject(body.connectionID,body.sdp);
-    stream.load();
+    await stream.load();
     res.json(stream.response());
 	return;
     const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
