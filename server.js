@@ -69,7 +69,7 @@ class StreamObject {
         };
 
         this.peer.oniceconnectionstatechange = () => {
-            if (this.peer.iceConnectionState === 'disconnected') {
+            if (this.peer != null && this.peer.iceConnectionState === 'disconnected') {
                 this.cleanup();
             }
         };
