@@ -102,7 +102,7 @@ app.post("/consumer", async ({ body }, res) => {
 
 app.post('/broadcast', async ({ body }, res) => {
     const stream = new StreamObject(body.connectionID,body.sdp);
-    stream.load();
+    await stream.load();
     res.json(stream.response());
 	return;
 
