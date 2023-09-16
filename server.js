@@ -22,20 +22,14 @@ class StreamObject{
        this.peer =  new webrtc.RTCPeerConnection({iceServers: cherry});
        this.desc = new webrtc.RTCSessionDescription(sdp);
        this.connectionID = connectionID;
+       this.answer = null;
        this.load()
     }
 
     async load(){
-        this.peer.setRemoteDescription(this.desc)
-        .then(() => {
-            return this.peer.createAnswer();
-        })
-        .then((answer) => {
-            return this.peer.setLocalDescription(answer);
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+        await this.peer.setRemoteDescription(this.desc);
+        this.answer = await this.peer.createAnswer();
+        await this.peer.setLocalDescription(this.answer);
     }
     response(){
         return {
