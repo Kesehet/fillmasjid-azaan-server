@@ -9,74 +9,6 @@ const cors = require('cors');
 
 
 
-class Broadcast{
-    constructor(adminStream,connectionID){
-        adminStream = adminStream;
-        this.connectionID = connectionID;
-    }
-}
-
-
-class StreamObject {
-    constructor(connectionID, sdp) {
-        this.peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
-        this.desc = new webrtc.RTCSessionDescription(sdp);
-        this.connectionID = connectionID;
-        this.answer = null;
-
-        // Add event listeners
-        this.addEventListeners();
-
-        // Set the remote description and wait for the correct state to load
-        this.peer.setRemoteDescription(this.desc);
-    }
-
-    addEventListeners() {
-        this.peer.onicecandidate = (event) => {
-            if (event.candidate) {
-                console.log('New ICE candidate:', event.candidate);
-                // You can send this candidate to the other peer if needed
-            }
-        };
-
-        this.peer.onsignalingstatechange = () => {
-            console.log('Signaling state changed to:', this.peer.signalingState);
-            if (this.peer.signalingState === 'have-remote-offer') {
-                this.load();
-            }
-        };
-
-        this.peer.oniceconnectionstatechange = () => {
-            console.log('ICE connection state changed to:', this.peer.iceConnectionState);
-        };
-
-        this.peer.onerror = (error) => {
-            console.error('RTCPeerConnection error:', error);
-        };
-    }
-
-    async load() {
-        try {
-            this.answer = await this.peer.createAnswer();
-            await this.peer.setLocalDescription(this.answer);
-        } catch (error) {
-            console.error("Error in load method:", error);
-        }
-    }
-
-    response() {
-        return {
-            sdp: this.peer.localDescription,
-            connectionID: this.connectionID
-        };
-    }
-}
-
-
-
-
-
-
 
 let senderStream = {};
 
@@ -101,6 +33,103 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({origin: 'https://app.fillmasjid.in'}));
+
+
+
+class Broadcast{
+    constructor(adminStream,connectionID){
+        adminStream = adminStream;
+        this.connectionID = connectionID;
+    }
+}
+
+
+class StreamObject {
+    constructor(connectionID, sdp,type ="consumer") {
+        this.peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
+        this.desc = new webrtc.RTCSessionDescription(sdp);
+        this.connectionID = connectionID;
+        this.answer = null;
+        this.track = null;
+
+        // Add event listeners
+        this.addEventListeners();
+
+        // Set the remote description and wait for the correct state to load
+        this.peer.setRemoteDescription(this.desc);
+        this.type=="admin"?this.peer.ontrack = (e) => handleTrackEvent(e, peer,body.connectionID):null;
+
+    }
+
+    addEventListeners() {
+        this.peer.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log('New ICE candidate:', event.candidate);
+                // You can send this candidate to the other peer if needed
+            }
+        };
+
+        this.peer.onsignalingstatechange = () => {
+            console.log('Signaling state changed to:', this.peer.signalingState);
+            if (this.peer.signalingState === 'have-remote-offer') {
+                this.load();
+            }
+        };
+
+        this.peer.oniceconnectionstatechange = () => {
+            console.log('ICE connection state changed to:', this.peer.iceConnectionState);
+            if (this.peer.iceConnectionState === 'disconnected') {
+                this.cleanup();
+            }
+        };
+
+        this.peer.onerror = (error) => {
+            console.error('RTCPeerConnection error:', error);
+        };
+    }
+
+    async load() {
+        try {
+            this.answer = await this.peer.createAnswer();
+            await this.peer.setLocalDescription(this.answer);
+        } catch (error) {
+            console.error("Error in load method:", error);
+        }
+    }
+    cleanup() {
+        // Close the RTCPeerConnection
+        this.peer.close();
+
+        // Nullify properties to release memory
+        this.peer = null;
+        this.desc = null;
+        this.answer = null;
+
+        console.log('StreamObject resources released.');
+    }
+
+    response() {
+        return {
+            sdp: this.peer.localDescription,
+            connectionID: this.connectionID
+        };
+    }
+
+    handleBroadcastStreamGetter(e){
+        this.track = e.streams[0];
+    }
+
+    AttachTrackToListen(admintrack){
+        admintrack.getTracks().forEach(track => this.peer.addTrack(track, admintrack));
+    }
+
+}
+
+
+
+
+
+
 
 app.post("/consumer", async ({ body }, res) => {
 	
@@ -129,7 +158,7 @@ app.post("/consumer", async ({ body }, res) => {
 });
 
 app.post('/broadcast', async ({ body }, res) => {
-    const stream = new StreamObject(body.connectionID,body.sdp);
+    const stream = new StreamObject(body.connectionID,body.sdp,type="admin");
     await stream.load();
     res.json(stream.response());
 	return;
