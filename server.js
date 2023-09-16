@@ -28,7 +28,7 @@ class StreamObject{
     async load(){
         this.peer.setRemoteDescription(this.desc);
         this.answer = await this.peer.createAnswer();
-        await this.peer.setLocalDescription(answer);
+        await this.peer.setLocalDescription(this.answer);
     }
     response(){
         return {
