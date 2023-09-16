@@ -35,12 +35,23 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({origin: 'https://app.fillmasjid.in'}));
 
 
+var Broadcasts = [];
+
 
 class Broadcast{
-    constructor(adminStream,connectionID){
-        adminStream = adminStream;
+    constructor(connectionID){
         this.connectionID = connectionID;
+        this.adminStream = null;
+        this.consumerStreams = [];
     }
+    addAdminStream(stream){
+        this.adminStream = stream;
+    }
+    addConsumerStream(stream){
+        stream.AttachTrackToListen(this.adminStream.track);
+        this.consumerStreams.push(stream);
+    }
+    
 }
 
 
@@ -91,11 +102,6 @@ class StreamObject {
         // Close the RTCPeerConnection
         this.peer.close();
 
-        // Nullify properties to release memory
-        this.peer = null;
-        this.desc = null;
-        this.answer = null;
-
         console.log('StreamObject resources released.');
     }
 
@@ -125,7 +131,7 @@ class StreamObject {
 app.post("/consumer", async ({ body }, res) => {
 	
 	const stream = new StreamObject(body.connectionID,body.sdp);
-    await stream.load();
+    Broadcasts[body.connectionID].addConsumerStream(stream);
     res.json(stream.response());
 	return;
     const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
@@ -149,9 +155,13 @@ app.post("/consumer", async ({ body }, res) => {
 });
 
 app.post('/broadcast', async ({ body }, res) => {
+
+    const broadcast = new Broadcast(body.adminStream,body.connectionID);
+
     const stream = new StreamObject(body.connectionID,body.sdp,type="admin");
-    await stream.load();
+    broadcast.setStream(stream);
     res.json(stream.response());
+
 	return;
 
     const peer = new webrtc.RTCPeerConnection({iceServers: cherry});
