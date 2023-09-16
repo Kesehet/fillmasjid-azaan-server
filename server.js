@@ -26,9 +26,16 @@ class StreamObject{
     }
 
     async load(){
-        await this.peer.setRemoteDescription(this.desc);
-        this.answer = await this.peer.createAnswer();
-        await this.peer.setLocalDescription(this.answer);
+        this.peer.setRemoteDescription(this.desc)
+        .then(() => {
+            return this.peer.createAnswer();
+        })
+        .then((answer) => {
+            return this.peer.setLocalDescription(answer);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
     }
     response(){
         return {
