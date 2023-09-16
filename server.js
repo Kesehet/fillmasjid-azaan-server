@@ -139,6 +139,10 @@ class StreamObject {
 
 app.post("/consumer", async ({ body }, res) => {
 	console.log(Broadcasts);
+    if(!Broadcasts[body.connectionID]){
+        res.json({})
+        return
+    }
 	const stream = new StreamObject(body.connectionID,body.sdp);
     Broadcasts[body.connectionID].addConsumerStream(stream);
     await stream.load();
