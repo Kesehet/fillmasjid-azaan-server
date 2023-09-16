@@ -76,12 +76,12 @@ class StreamObject {
     addEventListeners() {
         this.peer.onicecandidate = (event) => {
             if (event.candidate) {
-                console.log('New ICE candidate:', event.candidate);
+                //console.log('New ICE candidate:', event.candidate);
                 // You can send this candidate to the other peer if needed
             }
         };
         this.peer.onsignalingstatechange = () => {
-            console.log('peer.onsignalingstatechange ' + this.peer.signalingState);
+            //console.log('peer.onsignalingstatechange ' + this.peer.signalingState);
             if (this.peer.signalingState === 'have-remote-offer') {
                 this.load();
             }
