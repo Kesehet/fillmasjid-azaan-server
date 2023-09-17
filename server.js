@@ -148,8 +148,11 @@ app.post("/consumer", async ({ body }, res) => {
     Broadcasts[body.connectionID].addConsumerStream(stream);
     await stream.load();
     res.json(stream.response());
-    
-	return;
+
+    console.log(`
+    Consumers => ${Broadcasts[body.connectionID].consumerStreams.length}
+    Admin => ${Broadcasts[body.connectionID].adminStream.connectionID}
+    `);
 });
 
 app.post('/broadcast', async ({ body }, res) => {
