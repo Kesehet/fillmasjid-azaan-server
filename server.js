@@ -54,6 +54,7 @@ class Broadcast{
         stream.AttachTrackToListen(this.adminStream.track);
         if (this.consumerStreams[stream.version] != undefined) {
             this.consumerStreams[stream.version].cleanup();
+            this.consumerStreams[stream.version] = null;
         }
         this.consumerStreams[stream.version] = stream;
     }
@@ -116,7 +117,9 @@ async load() {
     cleanup() {
         // Close the RTCPeerConnection
         this.peer.close();
-
+        if(this.type=="admin"){
+            delete Broadcasts[this.connectionID];
+        }
         console.log('StreamObject resources released.');
     }
 
