@@ -120,7 +120,8 @@ class StreamObject {
     response() {
         return {
             sdp: this.peer.localDescription,
-            connectionID: this.connectionID
+            connectionID: this.connectionID,
+            version:this.version
         };
     }
 
