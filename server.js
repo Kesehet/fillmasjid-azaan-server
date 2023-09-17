@@ -45,24 +45,25 @@ class Broadcast{
     constructor(connectionID){
         this.connectionID = connectionID;
         this.adminStream = null;
-        this.consumerStreams = [];
+        this.consumerStreams = {};
     }
     addAdminStream(stream){
         this.adminStream = stream;
     }
     addConsumerStream(stream){
         stream.AttachTrackToListen(this.adminStream.track);
-        this.consumerStreams.push(stream);
+        this.consumerStreams[stream.version] = stream;
     }
 
 }
 
 
 class StreamObject {
-    constructor(connectionID, sdp,type ="consumer") {
+    constructor(connectionID, sdp, version,type ="consumer") {
         this.peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
         this.desc = new webrtc.RTCSessionDescription(sdp);
         this.connectionID = connectionID;
+        this.version = version;
         this.answer = null;
         this.track = null;
         this.type=type;
@@ -144,7 +145,7 @@ app.post("/consumer", async ({ body }, res) => {
         res.json({})
         return
     }
-	const stream = new StreamObject(body.connectionID,body.sdp);
+	const stream = new StreamObject(body.connectionID,body.sdp,body.version);
     Broadcasts[body.connectionID].addConsumerStream(stream);
     await stream.load();
     res.json(stream.response());
@@ -159,7 +160,7 @@ app.post('/broadcast', async ({ body }, res) => {
 
     const broadcast = new Broadcast(body.adminStream,body.connectionID);
 
-    const stream = new StreamObject(body.connectionID,body.sdp,type="admin");
+    const stream = new StreamObject(body.connectionID,body.sdp,body.version,type="admin");
     await stream.load();
     broadcast.addAdminStream(stream);
     Broadcasts[stream.connectionID] = broadcast;
