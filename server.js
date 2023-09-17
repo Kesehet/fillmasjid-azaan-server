@@ -51,7 +51,6 @@ class Broadcast{
         this.adminStream = stream;
     }
     addConsumerStream(stream){
-        console.log(this.adminStream);
         stream.AttachTrackToListen(this.adminStream.track);
         this.consumerStreams.push(stream);
     }
