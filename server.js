@@ -105,14 +105,14 @@ class StreamObject {
         };
     }
 
-    async load() {
-        try {
-            this.answer = await this.peer.createAnswer();
-            await this.peer.setLocalDescription(this.answer);
-        } catch (error) {
-            console.error("Error in load method:", error);
-        }
+async load() {
+    try {
+        const answer = await this.peer.createAnswer();
+        await this.peer.setLocalDescription(answer);
+    } catch (error) {
+        console.error("Error in load method:", error);
     }
+}
     cleanup() {
         // Close the RTCPeerConnection
         this.peer.close();
