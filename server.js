@@ -96,7 +96,7 @@ class StreamObject {
 
         this.peer.oniceconnectionstatechange = () => {
             console.log('peer.oniceconnectionstatechange ' + this.peer.iceConnectionState);
-            if (this.peer.iceConnectionState === 'disconnected') {
+            if (this.peer.iceConnectionState === 'disconnected' || this.peer.iceConnectionState === 'failed' || this.peer.iceConnectionState === 'closed') {
                 this.cleanup();
             }
         };
