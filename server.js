@@ -151,7 +151,7 @@ app.post("/consumer", async ({ body }, res) => {
     res.json(stream.response());
 
     console.log(`
-    Consumers => ${Broadcasts[body.connectionID].consumerStreams.keys().length}
+    Consumers => ${Object.keys(Broadcasts[body.connectionID].consumerStreams).length}
     Admin => ${Broadcasts[body.connectionID].adminStream.connectionID}
     `);
 });
