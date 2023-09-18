@@ -66,6 +66,7 @@ class StreamObject {
         this.version = version;
         this.answer = null;
         this.track = null;
+        this.rand = (Math.random() + 1).toString(36).substring(7);   
         this.type=type;
         // Add event listeners
         this.addEventListeners();
@@ -191,7 +192,8 @@ app.get('/broadcast', async (req, res) => {
                         ret2.push({
                             connectionID: stream.connectionID,
                             version: stream.version,
-                            state: stream.peer.connectionState
+                            state: stream.peer.connectionState,
+                            randomID: stream.rand 
                         });
                     }
                     else{
