@@ -174,7 +174,17 @@ app.post('/broadcast', async ({ body }, res) => {
 });
 
 app.get('/broadcast', async (req, res) => {
-    res.json(Broadcasts);
+    var ret = {};
+    // for each broadcast, get the list of consumers
+    Object.keys(Broadcasts).forEach((broadcast) => {
+        var ret2 = [];
+        Broadcasts[broadcast].consumerStreams.forEach((stream) => {
+            ret2.push(stream.version);
+        });
+        ret[broadcast] = ret2;
+    })
+
+    res.json(ret);
 })
 
 
