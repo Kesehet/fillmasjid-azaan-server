@@ -189,9 +189,15 @@ app.get('/broadcast', async (req, res) => {
                     if(stream.hasOwnProperty('version')){
                         ret2.push(stream.version);
                     }
+                    else{
+                        console.log("No version property");
+                    }
                 });
 
                 ret[broadcast] = ret2;
+            }
+            else{
+                console.log("No consumers available");
             }
         }
     }
