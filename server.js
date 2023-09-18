@@ -174,18 +174,35 @@ app.post('/broadcast', async ({ body }, res) => {
 });
 
 app.get('/broadcast', async (req, res) => {
-    var ret = {};
-    // for each broadcast, get the list of consumers
-    Object.keys(Broadcasts).forEach((broadcast) => {
-        var ret2 = [];
-        Broadcasts[broadcast].consumerStreams.forEach((stream) => {
-            ret2.push(stream.version);
-        });
-        ret[broadcast] = ret2;
-    })
+    let ret = {};
+
+    // Check if Broadcasts object is not empty
+    if(Object.keys(Broadcasts).length > 0){
+        // for each broadcast, get the list of consumers
+        for(let broadcast in Broadcasts){
+            let ret2 = [];
+
+            // Check if consumerStreams array is not empty
+            if(Broadcasts[broadcast].consumerStreams.length > 0){
+                Broadcasts[broadcast].consumerStreams.forEach((stream) => {
+                    // Check if version property exists in stream object
+                    if(stream.hasOwnProperty('version')){
+                        ret2.push(stream.version);
+                    }
+                });
+
+                ret[broadcast] = ret2;
+            }
+        }
+    }
+    else{
+        // Handle case when Broadcasts object is empty
+        console.log("No broadcasts available");
+    }
 
     res.json(ret);
 })
+
 
 
 
