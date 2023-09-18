@@ -52,10 +52,10 @@ class Broadcast{
     }
     addConsumerStream(stream){
         stream.AttachTrackToListen(this.adminStream.track);
-        if (this.consumerStreams[stream.version] != undefined) {
-            this.consumerStreams[stream.version].cleanup();
-            this.consumerStreams[stream.version] = null;
-        }
+        // if (this.consumerStreams[stream.version] != undefined) {
+        //     this.consumerStreams[stream.version].cleanup();
+        //     this.consumerStreams[stream.version] = null;
+        // }
         this.consumerStreams[stream.version] = stream;
     }
 
