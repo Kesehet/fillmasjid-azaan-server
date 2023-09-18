@@ -37,44 +37,50 @@ app.use(cors({origin: 'https://app.fillmasjid.in'}));
 var Broadcasts = {};
 
 
-class Broadcast{
-    constructor(connectionID){
+var Broadcasts = {};
+
+class Broadcast {
+    constructor(connectionID) {
         this.connectionID = connectionID;
         this.adminStream = null;
         this.consumerStreams = {};
     }
-    addAdminStream(stream){
+
+    addAdminStream(stream) {
         this.adminStream = stream;
     }
-    addConsumerStream(stream){
+
+    addConsumerStream(stream) {
         stream.AttachTrackToListen(this.adminStream.track);
-        // if (this.consumerStreams[stream.version] != undefined) {
-        //     this.consumerStreams[stream.version].cleanup();
-        //     this.consumerStreams[stream.version] = null;
-        // }
+        if (this.consumerStreams[stream.version]) {
+            this.consumerStreams[stream.version].cleanup();
+        }
         this.consumerStreams[stream.version] = stream;
     }
 
+    cleanup() {
+        if (this.adminStream) {
+            this.adminStream.cleanup();
+        }
+        for (let version in this.consumerStreams) {
+            this.consumerStreams[version].cleanup();
+        }
+    }
 }
 
 
 class StreamObject {
-    constructor(connectionID, sdp, version,type ="consumer") {
+    constructor(connectionID, sdp, version, type = "consumer") {
         this.peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
         this.desc = new webrtc.RTCSessionDescription(sdp);
         this.connectionID = connectionID;
         this.version = version;
-        this.answer = null;
-        this.track = null;
-        this.type=type;
-        // Add event listeners
+        this.type = type;
         this.addEventListeners();
-
-        // Set the remote description and wait for the correct state to load
         this.peer.setRemoteDescription(this.desc);
-        this.peer.ontrack = (e) => this.handleBroadcastStreamGetter(e);
-
+        this.peer.ontrack = (e) => this.handleBroadcastStreamGetter(e);  // Reintroduced this line
     }
+    
 
     addEventListeners() {
         this.peer.onicecandidate = (event) => {
@@ -102,18 +108,18 @@ class StreamObject {
         };
     }
 
-async load() {
-    try {
-        const answer = await this.peer.createAnswer();
-        await this.peer.setLocalDescription(answer);
-    } catch (error) {
-        console.error("Error in load method:", error);
+    async load() {
+        try {
+            const answer = await this.peer.createAnswer();
+            await this.peer.setLocalDescription(answer);
+        } catch (error) {
+            console.error("Error in load method:", error);
+        }
     }
-}
     cleanup() {
-        // Close the RTCPeerConnection
         this.peer.close();
-        if(this.type=="admin"){
+        if (this.type == "admin" && Broadcasts[this.connectionID]) {
+            Broadcasts[this.connectionID].cleanup();
             delete Broadcasts[this.connectionID];
         }
         console.log('StreamObject resources released.');
@@ -144,11 +150,11 @@ async load() {
 
 
 app.post("/consumer", async ({ body }, res) => {
-    if(!Broadcasts[body.connectionID]){
-        res.json({})
-        return
+    if (!Broadcasts[body.connectionID]) {
+        res.json({});
+        return;
     }
-	const stream = new StreamObject(body.connectionID,body.sdp,body.version);
+    const stream = new StreamObject(body.connectionID, body.sdp, body.version);
     Broadcasts[body.connectionID].addConsumerStream(stream);
     await stream.load();
     res.json(stream.response());
@@ -160,17 +166,12 @@ app.post("/consumer", async ({ body }, res) => {
 });
 
 app.post('/broadcast', async ({ body }, res) => {
-
-    const broadcast = new Broadcast(body.adminStream,body.connectionID);
-
-    const stream = new StreamObject(body.connectionID,body.sdp,body.version,type="admin");
+    const broadcast = new Broadcast(body.connectionID);
+    const stream = new StreamObject(body.connectionID, body.sdp, body.version, "admin");
     await stream.load();
     broadcast.addAdminStream(stream);
     Broadcasts[stream.connectionID] = broadcast;
     res.json(stream.response());
-
-	return;
-
 });
 
 app.get('/broadcast', async (req, res) => {
