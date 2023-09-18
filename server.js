@@ -36,9 +36,6 @@ app.use(cors({origin: 'https://app.fillmasjid.in'}));
 
 var Broadcasts = {};
 
-
-var Broadcasts = {};
-
 class Broadcast {
     constructor(connectionID) {
         this.connectionID = connectionID;
@@ -51,14 +48,14 @@ class Broadcast {
     }
 
     addConsumerStream(stream) {
-        stream.AttachTrackToListen(this.adminStream.track);
         if (this.consumerStreams[stream.version]) {
             this.consumerStreams[stream.version].cleanup();
         }
+        stream.AttachTrackToListen(this.adminStream.track);
         this.consumerStreams[stream.version] = stream;
     }
 
-    cleanup() {
+    cleanupAllStreams() {
         if (this.adminStream) {
             this.adminStream.cleanup();
         }
@@ -105,6 +102,7 @@ class StreamObject {
 
         this.peer.onerror = (error) => {
             console.error('RTCPeerConnection error:', error);
+            this.cleanup();
         };
     }
 
@@ -116,10 +114,11 @@ class StreamObject {
             console.error("Error in load method:", error);
         }
     }
+
     cleanup() {
         this.peer.close();
         if (this.type == "admin" && Broadcasts[this.connectionID]) {
-            Broadcasts[this.connectionID].cleanup();
+            Broadcasts[this.connectionID].cleanupAllStreams();
             delete Broadcasts[this.connectionID];
         }
         console.log('StreamObject resources released.');
