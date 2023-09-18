@@ -197,6 +197,7 @@ app.get('/broadcast', async (req, res) => {
                 ret[broadcast] = ret2;
             }
             else{
+                ret[broadcast] = [];
                 console.log("No consumers available");
             }
         }
