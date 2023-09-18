@@ -11,10 +11,6 @@ const cors = require('cors');
 
 
 
-
-
-let senderStream = {};
-
 var cherry =[
     {
         urls: "turn:74.235.112.32:3478",
@@ -176,6 +172,10 @@ app.post('/broadcast', async ({ body }, res) => {
 	return;
 
 });
+
+app.get('/broadcast', async (req, res) => {
+    res.json(Broadcasts);
+})
 
 
 
