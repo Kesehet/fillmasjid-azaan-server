@@ -183,9 +183,10 @@ app.get('/broadcast', async (req, res) => {
             let ret2 = [];
 
             // Check if consumerStreams array is not empty
-            if(Broadcasts[broadcast].consumerStreams.length > 0){
-                Broadcasts[broadcast].consumerStreams.forEach((stream) => {
-                    // Check if version property exists in stream object
+            if(Object.keys(Broadcasts[broadcast].consumerStreams).length > 0){
+                Object.keys(Broadcasts[broadcast].consumerStreams).forEach((streamKey) => {
+                    // Check if version property exists in stream object    
+                    let stream = Broadcasts[broadcast].consumerStreams[streamKey];
                     if(stream.hasOwnProperty('version')){
                         ret2.push({
                             connectionID: stream.connectionID,
