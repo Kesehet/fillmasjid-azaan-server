@@ -187,7 +187,11 @@ app.get('/broadcast', async (req, res) => {
                 Broadcasts[broadcast].consumerStreams.forEach((stream) => {
                     // Check if version property exists in stream object
                     if(stream.hasOwnProperty('version')){
-                        ret2.push(stream.version);
+                        ret2.push({
+                            connectionID: stream.connectionID,
+                            version: stream.version,
+                            state: stream.peer.connectionState
+                        });
                     }
                     else{
                         console.log("No version property");
