@@ -214,6 +214,7 @@ app.get('/broadcast', async (req, res) => {
         // Handle case when Broadcasts object is empty
         console.log("No broadcasts available");
     }
+    console.log(ret);
 
     res.json(ret);
 })
