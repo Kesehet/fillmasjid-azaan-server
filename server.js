@@ -145,6 +145,8 @@ async load() {
 
 
 app.post("/consumer", async ({ body }, res) => {
+    console.log("\n\n\n\n\n\n\n____ BODY REC _____ \n")
+    console.log(body);
     if(!Broadcasts[body.connectionID]){
         res.json({})
         return
