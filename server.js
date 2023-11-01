@@ -159,6 +159,7 @@ app.post("/consumer", async ({ body }, res) => {
     
     if(!Broadcasts[body.connectionID]){
         res.json({})
+        console.log(`Broadcast ${body.connectionID} does not exist`);
         return
     }
 	const stream = new StreamObject(body.connectionID,body.sdp,body.version);
