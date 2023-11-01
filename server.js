@@ -71,14 +71,14 @@ class StreamObject {
         // Add event listeners
         this.addEventListeners();
 
-        console.log(sdp);
-        // Set the remote description and wait for the correct state to load
-        try {
-            this.peer.setRemoteDescription(this.desc);    
-        } catch (error) {
+        if(sdp.type){
+            this.peer.setRemoteDescription(sdp);
+        }
+        else{
             this.peer.setRemoteDescription(this.convertSDP(this.desc));
         }
-        
+        // Set the remote description and wait for the correct state to load
+                
         this.peer.ontrack = (e) => this.handleBroadcastStreamGetter(e);
 
     }
