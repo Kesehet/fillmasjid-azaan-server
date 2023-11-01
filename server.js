@@ -73,10 +73,22 @@ class StreamObject {
 
         console.log(sdp);
         // Set the remote description and wait for the correct state to load
-        this.peer.setRemoteDescription(this.desc);
+        try {
+            this.peer.setRemoteDescription(this.desc);    
+        } catch (error) {
+            this.peer.setRemoteDescription(this.convertSDP(this.desc));
+        }
+        
         this.peer.ontrack = (e) => this.handleBroadcastStreamGetter(e);
 
     }
+
+    convertSDP(sdpString) {
+        return {
+          type: 'offer',
+          sdp: `${sdpString}`
+        };
+      }
 
     addEventListeners() {
         this.peer.onicecandidate = (event) => {
