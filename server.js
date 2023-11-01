@@ -59,33 +59,23 @@ class Broadcast{
 
 
 class StreamObject {
-    constructor(connectionID, sdp, version, type = "consumer") {
-        console.log("Initializing constructor...");
+    constructor(connectionID, sdp, version,type ="consumer") {
         this.peer = new webrtc.RTCPeerConnection({ iceServers: cherry });
-        console.log("Peer connection initialized.");
         this.desc = new webrtc.RTCSessionDescription(sdp);
-        console.log("Session description initialized.");
         this.connectionID = connectionID;
-        console.log("Connection ID set.");
         this.version = version;
-        console.log("Version set.");
         this.answer = null;
-        console.log("Answer set to null.");
         this.track = null;
-        console.log("Track set to null.");
-        this.rand = (Math.random() + 1).toString(36).substring(7);
-        console.log("Random string generated.");
-        this.type = type;
-        console.log("Type set.");
+        this.rand = (Math.random() + 1).toString(36).substring(7);   
+        this.type=type;
         // Add event listeners
         this.addEventListeners();
-        console.log("Event listeners added.");
-    
+
+        console.log(sdp);
         // Set the remote description and wait for the correct state to load
         this.peer.setRemoteDescription(this.desc);
-        console.log("Remote description set.");
         this.peer.ontrack = (e) => this.handleBroadcastStreamGetter(e);
-        console.log("Track event handler added.");
+
     }
 
     addEventListeners() {
@@ -159,7 +149,6 @@ app.post("/consumer", async ({ body }, res) => {
     
     if(!Broadcasts[body.connectionID]){
         res.json({})
-        console.log(`Broadcast ${body.connectionID} does not exist`);
         return
     }
 	const stream = new StreamObject(body.connectionID,body.sdp,body.version);
