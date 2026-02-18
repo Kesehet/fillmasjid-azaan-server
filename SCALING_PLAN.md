@@ -83,6 +83,8 @@ Use a **control-plane + media-plane** split:
 
 Azaan is ideal for optimization because it is one-to-many and speech-focused:
 
+- **Compatibility-first migration**: preserve the current client contract (existing endpoints, payload/response shapes, and connection behavior) so scaling improvements happen server-side without requiring client app updates.
+
 - **Audio-only mode** by default.
 - **Single publisher policy** per broadcast room.
 - **Listener receive-only role** (no upstream media/candidates beyond necessity).
