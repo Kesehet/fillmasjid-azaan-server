@@ -408,3 +408,27 @@ This checklist turns the scaling/security plan into an actionable production rol
 - [ ] Cost review (bandwidth, VM utilization).
 - [ ] Decision point: remain single VM or start SFU migration phase.
 
+
+---
+
+## Init script automation tasks
+
+- [x] System update and upgrade are automated in `init.sh`.
+- [x] Base tools (`git`, `curl`, `jq`, `htop`) are installed in `init.sh`.
+- [x] Node.js 20.x setup via NodeSource APT repo is automated in `init.sh`.
+- [x] Core infra packages are installed in `init.sh`:
+  - [x] `nginx`
+  - [x] `certbot`
+  - [x] `python3-certbot-nginx`
+  - [x] `coturn`
+  - [x] `ufw`
+  - [x] `fail2ban`
+  - [x] `prometheus-node-exporter`
+  - [x] `unattended-upgrades`
+- [x] UFW baseline policy and required ingress ports are configured in `init.sh`.
+- [x] Repository clone/update logic is implemented in `init.sh`.
+- [x] Project dependencies are installed (`npm ci` or fallback `npm install`) in `init.sh`.
+- [x] PM2 and `pm2-logrotate` are installed/configured in `init.sh`.
+- [x] Required services are enabled at boot and started in `init.sh`.
+- [x] Post-upgrade service restarts are handled safely in `init.sh`.
+- [x] Script-wide error handling is implemented using `set -Eeuo pipefail` + `trap`.
